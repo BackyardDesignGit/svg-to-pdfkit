@@ -35,6 +35,7 @@ Insert SVG into a PDF document created with PDFKit.
       - warningCallback [function] = function called when there is a warning
       - assumePt [boolean] = assume that units are PDF points instead of SVG pixels
       - precision [number] = precision factor for approximative calculations (default = 3)
+      - cmyk [boolean] = convert predefined colors (named colors) to CMYK (default = false)
 
 ## Fonts
 In the browser, it's easier to register fonts (<a href="https://github.com/foliojs/pdfkit/issues/623#issuecomment-284625259">see here how</a>) before calling SVGtoPDF. SVGtoPDF doesn't wait for font loading with asynchronous XMLHttpRequest.
