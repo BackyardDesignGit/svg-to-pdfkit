@@ -2491,18 +2491,34 @@ var SVGtoPDF = function (doc, svg, x, y, options) {
     this.drawInDocument = function (isClip, isMask) {
       doc.save();
 
-      // Add marked content to preserve SVG group structure in PDF
+      // Determine if we should use OCG (PDF Layer) or just marked content
+      let groupId = this.attr('id');
+      let useOCG = !isClip && !isMask && groupId && typeof beginOCG === 'function';
       let markedContentStarted = false;
-      if (!isClip && !isMask && typeof doc.markContent === 'function') {
-        // Ensure page.markings array exists (for compatibility with older PDFKit versions)
-        if (doc.page && !doc.page.markings) {
-          doc.page.markings = [];
-        }
+      let ocgStarted = false;
 
-        let groupMetadata = this.getGroupMetadata();
-        if (groupMetadata && Object.keys(groupMetadata).length > 0) {
-          doc.markContent('SVGGroup', groupMetadata);
-          markedContentStarted = true;
+      if (!isClip && !isMask) {
+        if (useOCG) {
+          // Use OCG for groups with IDs - creates actual PDF layers
+          let groupName = groupId;
+          let className = this.attr('class');
+          if (className) {
+            groupName = groupId + ' (' + className + ')';
+          }
+          beginOCG(groupId, groupName);
+          ocgStarted = true;
+        } else if (typeof doc.markContent === 'function') {
+          // Use marked content for groups without IDs or nested groups
+          // Ensure page.markings array exists (for compatibility with older PDFKit versions)
+          if (doc.page && !doc.page.markings) {
+            doc.page.markings = [];
+          }
+
+          let groupMetadata = this.getGroupMetadata();
+          if (groupMetadata && Object.keys(groupMetadata).length > 0) {
+            doc.markContent('SVGGroup', groupMetadata);
+            markedContentStarted = true;
+          }
         }
       }
 
@@ -2511,8 +2527,10 @@ var SVGtoPDF = function (doc, svg, x, y, options) {
       }
       this.drawContent(isClip, isMask);
 
-      // End marked content if it was started
-      if (markedContentStarted) {
+      // End OCG or marked content if it was started
+      if (ocgStarted) {
+        endOCG();
+      } else if (markedContentStarted) {
         doc.endMarkedContent();
       }
 
@@ -3712,7 +3730,143 @@ var SVGtoPDF = function (doc, svg, x, y, options) {
     groupStack = [],
     documentCache = {},
     links = [],
-    styleRules = [];
+    styleRules = [],
+    // Optional Content Groups (OCG) / PDF Layers support
+    ocgs = [],           // Array of all OCG references
+    ocgStack = [],       // Stack to track OCG hierarchy
+    ocgById = {};        // Map of group ID to OCG object
+
+  // Helper function to create an OCG (Optional Content Group) for a layer
+  function createOCG(groupId, groupName) {
+    // Check if OCG already exists for this ID
+    if (ocgById[groupId]) {
+      return ocgById[groupId];
+    }
+
+    // Create the OCG dictionary
+    // Adding Intent and Usage for better compatibility with viewers
+    const ocgRef = doc.ref({
+      Type: 'OCG',
+      Name: new String(groupName || groupId),
+      Intent: ['View', 'Design'],  // Indicates this is for viewing and design
+      Usage: {
+        CreatorInfo: {
+          Creator: new String('SVG-to-PDFKit'),
+          Subtype: 'Artwork'
+        }
+      }
+    });
+
+    // Store OCG information
+    const ocgInfo = {
+      id: groupId,
+      ref: ocgRef,
+      name: groupName || groupId,
+      children: []
+    };
+
+    ocgs.push(ocgInfo);
+    ocgById[groupId] = ocgInfo;
+
+    return ocgInfo;
+  }
+
+  // Helper function to begin an OCG content block
+  function beginOCG(groupId, groupName) {
+    const ocg = createOCG(groupId, groupName);
+
+    // Add to parent's children if there's a parent
+    if (ocgStack.length > 0) {
+      const parent = ocgStack[ocgStack.length - 1];
+      if (parent.children.indexOf(ocg) === -1) {
+        parent.children.push(ocg);
+      }
+    }
+
+    ocgStack.push(ocg);
+
+    // Create a unique name for this OCG reference
+    const ocgName = 'OC' + ocg.id.replace(/[^a-zA-Z0-9]/g, '_');
+
+    // Add the OCG to page resources Properties
+    // Properties is a dictionary that maps names to OCG references
+    if (doc.page && doc.page.resources && doc.page.resources.data) {
+      const resourcesData = doc.page.resources.data;
+      if (!resourcesData.Properties) {
+        resourcesData.Properties = {};
+      }
+      resourcesData.Properties[ocgName] = ocg.ref;
+
+      // Begin marked content block referencing the OCG
+      doc.addContent('/OC /' + ocgName + ' BDC');
+    } else {
+      // Fallback if resources not available - just use marked content without OCG reference
+      doc.addContent('/OC /' + ocgName + ' BDC');
+    }
+
+    return ocg;
+  }
+
+  // Helper function to end an OCG content block
+  function endOCG() {
+    if (ocgStack.length > 0) {
+      ocgStack.pop();
+    }
+    doc.addContent('EMC');
+  }
+
+  // Helper function to finalize OCG structures in the PDF catalog
+  function finalizeOCGs() {
+    if (ocgs.length === 0) {
+      return; // No OCGs to add
+    }
+
+    // Finalize all OCG references
+    ocgs.forEach(ocg => {
+      ocg.ref.end();
+    });
+
+    // Build the Order array (layer hierarchy)
+    function buildOrderArray(ocgList) {
+      const order = [];
+      ocgList.forEach(ocg => {
+        order.push(ocg.ref);
+        if (ocg.children.length > 0) {
+          order.push(buildOrderArray(ocg.children));
+        }
+      });
+      return order;
+    }
+
+    // Get top-level OCGs (those not in anyone's children)
+    const topLevelOCGs = ocgs.filter(ocg => {
+      return !ocgs.some(parent => parent.children.indexOf(ocg) !== -1);
+    });
+
+    // Create Order as an indirect object (like Illustrator does)
+    const orderArray = buildOrderArray(topLevelOCGs);
+    const orderRef = doc.ref(orderArray);
+    orderRef.end();
+
+    // Create OCProperties dictionary matching Illustrator's structure
+    const ocProperties = doc.ref({
+      OCGs: ocgs.map(ocg => ocg.ref),
+      D: {
+        Name: new String('Default'),
+        OFF: [],
+        ON: ocgs.map(ocg => ocg.ref),  // All layers visible by default
+        Order: orderRef,  // Indirect reference to Order array
+        RBGroups: []  // Radio Button Groups (empty but required by Illustrator)
+      }
+    });
+
+    ocProperties.end();
+
+    // Add OCProperties to the catalog
+    if (!doc._root.data.OCProperties) {
+      doc._root.data.OCProperties = ocProperties;
+    }
+  }
 
   if (typeof warningCallback !== 'function') {
     warningCallback = function (str) {
@@ -3844,6 +3998,9 @@ var SVGtoPDF = function (doc, svg, x, y, options) {
       }
       doc.restore();
       doc._fillColor = savedFillColor;
+
+      // Finalize OCG structures (PDF Layers) if any were created
+      finalizeOCGs();
     } else {
       warningCallback('SVGtoPDF: this element can\'t be rendered directly: ' + svg.nodeName);
     }
