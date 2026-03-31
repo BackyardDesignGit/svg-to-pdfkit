@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4b876d10-e283-4d2e-a8bd-99bbe23aca83" name="Changes" comment="typings">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="4b876d10-e283-4d2e-a8bd-99bbe23aca83" name="Changes" comment="preserve svg group structure">
+      <change beforePath="$PROJECT_DIR$/GROUP_PRESERVATION.md" beforeDir="false" afterPath="$PROJECT_DIR$/GROUP_PRESERVATION.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,6 +21,12 @@
     </persistenceIdMap>
   </component>
   <component name="Git.Settings">
+    <option name="PUSH_TAGS">
+      <GitPushTagMode>
+        <option name="argument" value="--tags" />
+        <option name="title" value="All" />
+      </GitPushTagMode>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectColorInfo">{
@@ -40,9 +46,10 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
     &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
     &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;/Users/frank/Documents/PRJ/interlutions/bydgshop/SVG-to-PDFKit&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
@@ -59,8 +66,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-PS-252.28539.9" />
-        <option value="bundled-php-predefined-a98d8de5180a-58f58c5035b3-com.jetbrains.php.sharedIndexes-PS-252.28539.9" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-PS-253.32098.40" />
+        <option value="bundled-php-predefined-a98d8de5180a-0e0d91225499-com.jetbrains.php.sharedIndexes-PS-253.32098.40" />
       </set>
     </attachedChunks>
   </component>
@@ -80,7 +87,9 @@
       <workItem from="1758721924458" duration="660000" />
       <workItem from="1759152452422" duration="7016000" />
       <workItem from="1773071614551" duration="9147000" />
-      <workItem from="1773152456230" duration="4000" />
+      <workItem from="1773152456230" duration="1666000" />
+      <workItem from="1774968878106" duration="428000" />
+      <workItem from="1774969392511" duration="1017000" />
     </task>
     <task id="LOCAL-00001" summary="added spot color support adapted from alvarcarto/SVG-to-PDFKit,&#10;included spot colors in docEndGroup">
       <option name="closed" value="true" />
@@ -146,7 +155,31 @@
       <option name="project" value="LOCAL" />
       <updated>1773136974299</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="version bump">
+      <option name="closed" value="true" />
+      <created>1773152469565</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1773152469565</updated>
+    </task>
+    <task id="LOCAL-00010" summary="documentation">
+      <option name="closed" value="true" />
+      <created>1773154009673</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1773154009673</updated>
+    </task>
+    <task id="LOCAL-00011" summary="preserve svg group structure">
+      <option name="closed" value="true" />
+      <created>1774970331607</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1774970331607</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -170,7 +203,10 @@
     <MESSAGE value="cmyk default colors" />
     <MESSAGE value="pdfkit update" />
     <MESSAGE value="typings" />
-    <option name="LAST_COMMIT_MESSAGE" value="typings" />
+    <MESSAGE value="version bump" />
+    <MESSAGE value="documentation" />
+    <MESSAGE value="preserve svg group structure" />
+    <option name="LAST_COMMIT_MESSAGE" value="preserve svg group structure" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
