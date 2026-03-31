@@ -236,4 +236,8 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+.claude/settings.json
 
+# Test output files
+test_*.js
+test_*.pdf

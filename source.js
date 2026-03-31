@@ -2490,14 +2490,67 @@ var SVGtoPDF = function (doc, svg, x, y, options) {
     SvgElemContainer.call(this, obj, inherits);
     this.drawInDocument = function (isClip, isMask) {
       doc.save();
+
+      // Add marked content to preserve SVG group structure in PDF
+      let markedContentStarted = false;
+      if (!isClip && !isMask) {
+        let groupMetadata = this.getGroupMetadata();
+        if (groupMetadata && Object.keys(groupMetadata).length > 0) {
+          doc.markContent('SVGGroup', groupMetadata);
+          markedContentStarted = true;
+        }
+      }
+
       if (this.link && !isClip && !isMask) {
         this.addLink();
       }
       this.drawContent(isClip, isMask);
+
+      // End marked content if it was started
+      if (markedContentStarted) {
+        doc.endMarkedContent();
+      }
+
       doc.restore();
     };
     this.getTransformation = function () {
       return this.get('transform');
+    };
+    this.getGroupMetadata = function () {
+      let metadata = {};
+
+      // Add MCID (Marked Content ID)
+      metadata.MCID = doc._mcidCount = (doc._mcidCount || 0) + 1;
+
+      // Add SVG id attribute if present
+      let id = this.attr('id');
+      if (id) {
+        metadata.GroupID = new String(id);
+      }
+
+      // Add SVG class attribute if present
+      let className = this.attr('class');
+      if (className) {
+        metadata.ClassName = new String(className);
+      }
+
+      // Add transform attribute if present (as string for reference)
+      let transform = this.attr('transform');
+      if (transform) {
+        metadata.Transform = new String(transform);
+      }
+
+      // Add data-* attributes if present
+      if (typeof obj.attributes !== 'undefined') {
+        for (let i = 0; i < obj.attributes.length; i++) {
+          let attr = obj.attributes[i];
+          if (attr.name.startsWith('data-')) {
+            metadata[attr.name] = new String(attr.value);
+          }
+        }
+      }
+
+      return metadata;
     };
   };
 
