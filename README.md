@@ -1,6 +1,8 @@
 # SVG-to-PDFKit
 Insert SVG into a PDF document created with PDFKit.
 
+Fork of https://alafr.github.io/SVG-to-PDFKit that enables spot colors.
+
 ## Install
 
     npm install svg-to-pdfkit --save
