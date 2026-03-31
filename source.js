@@ -2601,6 +2601,22 @@ var SVGtoPDF = function (doc, svg, x, y, options) {
     };
     this.drawInDocument = function (isClip, isMask) {
       doc.save();
+
+      // Add marked content to preserve nested SVG structure in PDF
+      let markedContentStarted = false;
+      if (!isClip && !isMask && !this.isOuterElement && typeof doc.markContent === 'function') {
+        // Ensure page.markings array exists (for compatibility with older PDFKit versions)
+        if (doc.page && !doc.page.markings) {
+          doc.page.markings = [];
+        }
+
+        let svgMetadata = this.getSvgMetadata();
+        if (svgMetadata && Object.keys(svgMetadata).length > 0) {
+          doc.markContent('NestedSVG', svgMetadata);
+          markedContentStarted = true;
+        }
+      }
+
       if (this.get('overflow') === 'hidden') {
         new SvgShape().M(x, y).L(x + width, y).L(x + width, y + height).L(x, y + height).Z()
           .transform(this.get('transform'))
@@ -2608,6 +2624,12 @@ var SVGtoPDF = function (doc, svg, x, y, options) {
         doc.clip();
       }
       this.drawContent(isClip, isMask);
+
+      // End marked content if it was started
+      if (markedContentStarted) {
+        doc.endMarkedContent();
+      }
+
       doc.restore();
     };
     this.getTransformation = function () {
@@ -2617,6 +2639,54 @@ var SVGtoPDF = function (doc, svg, x, y, options) {
         parseAspectRatio(aspectRatio, width, height, viewBox[2], viewBox[3]),
         [1, 0, 0, 1, -viewBox[0], -viewBox[1]]
       );
+    };
+    this.getSvgMetadata = function () {
+      let metadata = {};
+
+      // Add MCID (Marked Content ID)
+      metadata.MCID = doc._mcidCount = (doc._mcidCount || 0) + 1;
+
+      // Add SVG id attribute if present
+      let id = this.attr('id');
+      if (id) {
+        metadata.SVGID = new String(id);
+      }
+
+      // Add SVG class attribute if present
+      let className = this.attr('class');
+      if (className) {
+        metadata.ClassName = new String(className);
+      }
+
+      // Add viewBox if present
+      let viewBoxAttr = this.attr('viewBox');
+      if (viewBoxAttr) {
+        metadata.ViewBox = new String(viewBoxAttr);
+      }
+
+      // Add dimensions
+      if (width || height) {
+        metadata.Width = width;
+        metadata.Height = height;
+      }
+
+      // Add x, y position if not at origin
+      if (x !== 0 || y !== 0) {
+        metadata.X = x;
+        metadata.Y = y;
+      }
+
+      // Add data-* attributes if present
+      if (typeof obj.attributes !== 'undefined') {
+        for (let i = 0; i < obj.attributes.length; i++) {
+          let attr = obj.attributes[i];
+          if (attr.name.startsWith('data-')) {
+            metadata[attr.name] = new String(attr.value);
+          }
+        }
+      }
+
+      return metadata;
     };
   };
 
