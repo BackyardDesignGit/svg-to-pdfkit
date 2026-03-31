@@ -4,8 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4b876d10-e283-4d2e-a8bd-99bbe23aca83" name="Changes" comment="preserve svg group structure">
-      <change beforePath="$PROJECT_DIR$/GROUP_PRESERVATION.md" beforeDir="false" afterPath="$PROJECT_DIR$/GROUP_PRESERVATION.md" afterDir="false" />
+    <list default="true" id="4b876d10-e283-4d2e-a8bd-99bbe23aca83" name="Changes" comment="fixed issue with marked content">
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,7 +89,7 @@
       <workItem from="1773071614551" duration="9147000" />
       <workItem from="1773152456230" duration="1666000" />
       <workItem from="1774968878106" duration="428000" />
-      <workItem from="1774969392511" duration="1017000" />
+      <workItem from="1774969392511" duration="1572000" />
     </task>
     <task id="LOCAL-00001" summary="added spot color support adapted from alvarcarto/SVG-to-PDFKit,&#10;included spot colors in docEndGroup">
       <option name="closed" value="true" />
@@ -179,7 +179,23 @@
       <option name="project" value="LOCAL" />
       <updated>1774970331607</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="preserve svg group structure">
+      <option name="closed" value="true" />
+      <created>1774970416225</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1774970416225</updated>
+    </task>
+    <task id="LOCAL-00013" summary="fixed issue with marked content">
+      <option name="closed" value="true" />
+      <created>1774970958506</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1774970958506</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -206,7 +222,8 @@
     <MESSAGE value="version bump" />
     <MESSAGE value="documentation" />
     <MESSAGE value="preserve svg group structure" />
-    <option name="LAST_COMMIT_MESSAGE" value="preserve svg group structure" />
+    <MESSAGE value="fixed issue with marked content" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed issue with marked content" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

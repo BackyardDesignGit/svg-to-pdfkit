@@ -2493,7 +2493,12 @@ var SVGtoPDF = function (doc, svg, x, y, options) {
 
       // Add marked content to preserve SVG group structure in PDF
       let markedContentStarted = false;
-      if (!isClip && !isMask) {
+      if (!isClip && !isMask && typeof doc.markContent === 'function') {
+        // Ensure page.markings array exists (for compatibility with older PDFKit versions)
+        if (doc.page && !doc.page.markings) {
+          doc.page.markings = [];
+        }
+
         let groupMetadata = this.getGroupMetadata();
         if (groupMetadata && Object.keys(groupMetadata).length > 0) {
           doc.markContent('SVGGroup', groupMetadata);
